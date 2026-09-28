@@ -258,7 +258,7 @@ def calc_string_text_pos(text: str, start_offs: int, end_offs: int, pref_col: in
     cols = 0
     pos = start_offs
     for grapheme in wcwidth.iter_graphemes(text[start_offs:end_offs]):
-        grapheme_width = wcwidth.width(grapheme, control_codes="ignore")
+        grapheme_width = wcwidth.width(grapheme, term_program=True)
         if grapheme_width + cols > pref_col:
             return pos, cols
         cols += grapheme_width
@@ -325,11 +325,11 @@ def calc_width(text: str | bytes, start_offs: int, end_offs: int) -> int:
         raise ValueError(msg)
 
     if isinstance(text, str):
-        return wcwidth.width(text[start_offs:end_offs], control_codes="ignore")
+        return wcwidth.width(text[start_offs:end_offs], term_program=True)
 
     if _byte_encoding == "utf8":
         try:
-            return wcwidth.width(text[start_offs:end_offs].decode("utf-8"), control_codes="ignore")
+            return wcwidth.width(text[start_offs:end_offs].decode("utf-8"), term_program=True)
         except UnicodeDecodeError as exc:
             warnings.warn(
                 "`calc_width` with text encoded to bytes can produce incorrect results "
@@ -363,12 +363,12 @@ def is_wide_char(text: str | bytes, offs: int) -> bool:
     """
     if isinstance(text, str):
         grapheme = next(wcwidth.iter_graphemes(text[offs:]))
-        return wcwidth.width(grapheme, control_codes="ignore") == 2
+        return wcwidth.width(grapheme, term_program=True) == 2
     if not isinstance(text, bytes):
         raise TypeError(text)
     if _byte_encoding == "utf8":
         grapheme, _ = _decode_grapheme_at(text, offs, len(text))
-        return wcwidth.width(grapheme, control_codes="ignore") == 2
+        return wcwidth.width(grapheme, term_program=True) == 2
     if _byte_encoding == "wide":
         return within_double_byte(text, offs, offs) == 1
     return False

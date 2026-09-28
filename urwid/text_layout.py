@@ -25,8 +25,6 @@ from __future__ import annotations
 import functools
 import typing
 
-import wcwidth
-
 from urwid.str_util import calc_text_pos, calc_width, is_wide_char, move_next_char, move_prev_char
 from urwid.util import calc_trim_text, get_encoding
 
@@ -52,7 +50,7 @@ def get_ellipsis_string(encoding: str) -> str:
 @functools.lru_cache(maxsize=4)
 def _get_width(string: str) -> int:
     """Get ellipsis character width for given encoding."""
-    return wcwidth.width(string, control_codes="ignore")
+    return calc_width(string, 0, len(string))
 
 
 class TextLayout:

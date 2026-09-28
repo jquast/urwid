@@ -26,10 +26,9 @@ import typing
 import warnings
 from pprint import pformat
 
-import wcwidth
-
 from urwid.canvas import CanvasError, TextCanvas
 from urwid.display.escape import SAFE_ASCII_DEC_SPECIAL_RE
+from urwid.str_util import calc_width
 from urwid.util import apply_target_encoding
 
 if typing.TYPE_CHECKING:
@@ -66,7 +65,7 @@ def separate_glyphs(gdata: str, height: int) -> tuple[dict[str, tuple[int, list[
             character = key_line[key_index]
 
         if key_index < len(key_line) and key_line[key_index] == character:
-            end_col += wcwidth.width(character, control_codes="ignore")
+            end_col += calc_width(character, 0, 1)
             key_index += 1
             continue
 
@@ -82,7 +81,7 @@ def separate_glyphs(gdata: str, height: int) -> tuple[dict[str, tuple[int, list[
                 if j >= len(line):
                     fill = end_col - start_col - y
                     break
-                y += wcwidth.width(line[j], control_codes="ignore")
+                y += calc_width(line, j, j + 1)
                 j += 1
             if y + fill != end_col - start_col:
                 raise ValueError(repr((y, fill, end_col)))

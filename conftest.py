@@ -6,11 +6,21 @@ import importlib.util
 import sys
 import typing
 
+import pytest
+
 if typing.TYPE_CHECKING:
     from pathlib import Path
 
 IS_WINDOWS = sys.platform == "win32"
 IS_GRAALPY = sys.implementation.name == "graalpy"
+
+
+@pytest.fixture(autouse=True)
+def generic_terminal(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Unset TERM and TERM_PROGRAM so that terminal-specific width corrections are not applied."""
+    monkeypatch.delenv("TERM", raising=False)
+    monkeypatch.delenv("TERM_PROGRAM", raising=False)
+
 
 # Modules that import only on one platform. Urwid picks between them at runtime
 # (see `urwid/display/raw.py` and the `sys.platform` guards in `urwid/__init__.py`),
